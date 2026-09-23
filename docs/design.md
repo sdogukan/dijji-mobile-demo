@@ -80,7 +80,7 @@ _SignInScreen + AndroidManifest windowSoftInputMode._
 +------------------------------+
 ```
 
-_Conflict: ProductsScreen renders a TextInput (testID search_input, accessibilityLabel/placeholder "Search products", styles.input) between welcome_text and the product list, plus an empty-state Text (testID empty_text). The committed wireframe shows neither. A wireframe is an intent artifact, so the existing diagram is kept unchanged until the user chooses._
+_Conflict: ProductsScreen renders a `searchContainer` View between `welcome_text` and the product list, holding a TextInput (testID `search_input`, placeholder "Search products", right padding 36) and, only while the query is non-empty, a "×" Pressable (testID `search_clear_button`) absolutely positioned 10pt from the input's right edge; an empty-state Text (testID `empty_text`) replaces the list when nothing matches. The committed wireframe shows none of these. A wireframe is an intent artifact, so the existing diagram is kept unchanged until the user chooses._
 
 ### Products — notes
 
@@ -91,7 +91,7 @@ Body: FlatList of cards (border, radius 12, padding 16), name left, "<price> TL"
 Each card's accessibilityLabel is the product name.
 States: only a populated state — no empty/loading/error, since data is static.
 
-_Conflict: the code now has two states (populated / empty) and a search box with autoCapitalize=none, autoCorrect=false, matching a case-insensitive substring of `name` only — `description` is not searched. The committed note explicitly states there is no empty state. Notes are an intent artifact, so the existing value is kept unchanged until the user chooses._
+_Conflict: the code has two list states (populated / empty) and a search box with autoCapitalize=none, autoCorrect=false, matching a case-insensitive substring of `name` only — `description` is not searched. This change adds a clear control: rendered only while the query is non-empty, accessibilityLabel "Clear search", hitSlop 12, onPress resets the query to '' (list restored, empty-state text removed); deleting the text manually also hides it. The committed note explicitly states there is no empty state. Notes are an intent artifact, so the existing value is kept unchanged until the user chooses._
 
 ### Product detail — wireframe
 
@@ -193,7 +193,7 @@ Stepper button: 44x44 circle, 1px border.
 Modal: none.
 Rule: every Pressable/TextInput has a testID and an accessibilityLabel.
 
-_All components are inline in App.tsx; no shared component library._
+_New pattern in App.tsx not in the committed list: an inline clear icon button — a Pressable absolutely positioned inside a `searchContainer` wrapper (right 10, padding 4, hitSlop 12) over a TextInput given extra right padding (36), showing a "×" glyph at 18/600 in #6b7280, rendered only while the input is non-empty. It reuses existing palette and type-scale tokens and carries a testID + accessibilityLabel, so Color palette, Typography and the testability rule are unaffected. The component list is a design-system decision, so the existing value is kept unchanged until the user chooses._
 
 ### Responsive breakpoints
 
