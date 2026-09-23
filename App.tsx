@@ -139,6 +139,11 @@ function ProductsScreen({
   onOpen: (product: Product) => void;
   onSignOut: () => void;
 }) {
+  const [query, setQuery] = useState('');
+  const filteredProducts = PRODUCTS.filter((product) =>
+    product.name.toLowerCase().includes(query.toLowerCase()),
+  );
+
   return (
     <SafeAreaView style={styles.screen} testID="products_screen">
       <View style={styles.row}>
@@ -152,21 +157,37 @@ function ProductsScreen({
       <Text style={styles.hint} testID="welcome_text">
         Welcome, {user}
       </Text>
-      <FlatList
-        data={PRODUCTS}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Pressable
-            testID={`product_${item.id}`}
-            accessibilityLabel={item.name}
-            onPress={() => onOpen(item)}
-            style={styles.card}
-          >
-            <Text style={styles.cardTitle}>{item.name}</Text>
-            <Text style={styles.cardPrice}>{item.price} TL</Text>
-          </Pressable>
-        )}
+      <TextInput
+        testID="search_input"
+        accessibilityLabel="Search products"
+        placeholder="Search products"
+        autoCapitalize="none"
+        autoCorrect={false}
+        value={query}
+        onChangeText={setQuery}
+        style={styles.input}
       />
+      {filteredProducts.length === 0 ? (
+        <Text style={styles.hint} testID="empty_text" accessibilityLabel="No products match">
+          No products match
+        </Text>
+      ) : (
+        <FlatList
+          data={filteredProducts}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Pressable
+              testID={`product_${item.id}`}
+              accessibilityLabel={item.name}
+              onPress={() => onOpen(item)}
+              style={styles.card}
+            >
+              <Text style={styles.cardTitle}>{item.name}</Text>
+              <Text style={styles.cardPrice}>{item.price} TL</Text>
+            </Pressable>
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 }
