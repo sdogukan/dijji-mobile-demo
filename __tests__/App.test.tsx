@@ -98,3 +98,57 @@ describe('Products screen search', () => {
     expect(root.findByProps({ testID: 'signout_button' })).toBeTruthy();
   });
 });
+
+describe('Products screen search clear button', () => {
+  test('is absent when the query is empty', async () => {
+    const root = await renderSignedIn();
+    expect(() => root.findByProps({ testID: 'search_clear_button' })).toThrow();
+  });
+
+  test('appears after typing a query, including one that matches nothing', async () => {
+    const root = await renderSignedIn();
+    await act(() => {
+      root.findByProps({ testID: 'search_input' }).props.onChangeText('xyz');
+    });
+    const clearButton = root.findByProps({ testID: 'search_clear_button' });
+    expect(clearButton.props.accessibilityLabel).toBeTruthy();
+  });
+
+  test('pressing it clears a narrowed query and restores all 3 cards', async () => {
+    const root = await renderSignedIn();
+    await act(() => {
+      root.findByProps({ testID: 'search_input' }).props.onChangeText('esp');
+    });
+    await act(() => {
+      root.findByProps({ testID: 'search_clear_button' }).props.onPress();
+    });
+    expect(root.findByProps({ testID: 'search_input' }).props.value).toBe('');
+    expect(findProductCards(root)).toHaveLength(3);
+    expect(() => root.findByProps({ testID: 'empty_text' })).toThrow();
+  });
+
+  test('pressing it clears a no-match query and restores all 3 cards', async () => {
+    const root = await renderSignedIn();
+    await act(() => {
+      root.findByProps({ testID: 'search_input' }).props.onChangeText('xyz');
+    });
+    await act(() => {
+      root.findByProps({ testID: 'search_clear_button' }).props.onPress();
+    });
+    expect(root.findByProps({ testID: 'search_input' }).props.value).toBe('');
+    expect(findProductCards(root)).toHaveLength(3);
+    expect(() => root.findByProps({ testID: 'empty_text' })).toThrow();
+  });
+
+  test('disappears when the query is deleted manually', async () => {
+    const root = await renderSignedIn();
+    await act(() => {
+      root.findByProps({ testID: 'search_input' }).props.onChangeText('esp');
+    });
+    expect(() => root.findByProps({ testID: 'search_clear_button' })).not.toThrow();
+    await act(() => {
+      root.findByProps({ testID: 'search_input' }).props.onChangeText('');
+    });
+    expect(() => root.findByProps({ testID: 'search_clear_button' })).toThrow();
+  });
+});
