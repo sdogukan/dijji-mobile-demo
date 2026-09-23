@@ -40,7 +40,7 @@ _SignInScreen.submit; username is trimmed, password is compared verbatim._
 3. Detail screen shows the product name, description, quantity 1 and total = price.
 4. User taps "‹ Back" -> Products screen (quantity is not kept).
 
-_ProductsScreen FlatList over PRODUCTS; Root sets Screen {name: 'detail', product}; DetailScreen onBack sets {name: 'products'}; quantity is local state of DetailScreen so it resets on re-entry._
+_Conflict: ProductsScreen now holds a `query` state and renders `PRODUCTS.filter(p => p.name.toLowerCase().includes(query.toLowerCase()))`; when the result is empty the FlatList is replaced by an `empty_text` message ("No products match"). Step 1 of the committed flow therefore holds only for an empty query, and the flow records no search step. A flow is an intent decision, so the existing value is kept unchanged until the user chooses. Note: qa `Coverage targets` states "E2E: all 4 flows" — option 2 makes that 5._
 
 ### Flow: Adjust quantity and see total (SCR-detail)
 

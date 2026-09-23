@@ -38,16 +38,23 @@ _User-approved targets; no coverage threshold is configured in jest.config.js or
 | 4 | Browse and open detail | Sign in -> tap product_p2 -> detail_title 'Flat White', total_text 'Total: 65 TL' -> tap back_button -> products_screen visible |
 | 5 | Adjust quantity and total | Open product_p1 -> tap increment_button twice -> quantity_text 3, total_text 'Total: 135 TL' -> tap decrement_button 3 times -> quantity_text 1 |
 | 6 | Sign out | Sign in -> tap signout_button -> signin_screen visible with empty inputs |
+| 7 | Search — narrow the list | Sign in -> type 'esp' into search_input -> product_p1 visible, product_p2 and product_p3 not visible -> open product_p1 -> detail_title 'Espresso' |
+| 8 | Search — no match and recovery | Sign in -> type 'xyz' into search_input -> no product_ card visible, empty_text 'No products match' -> clear search_input -> product_p1..p3 visible again |
 
-_Covers the 4 architecture flows 1:1 (flow 1 -> #1-3, flow 2 -> #4, flow 3 -> #5, flow 4 -> #6). No Maestro flows are committed in the repo; DIJJI writes them per task into the run workspace/e2e/mobile/._
+_Rows 1-6 unchanged. Rows 7-8 added for the search box shipped in ProductsScreen (testID search_input, empty_text); both are expressed in the testIDs Maestro selects on. No Maestro flows are committed in the repo; DIJJI writes them per task into the run workspace/e2e/mobile/._
 
 ### Unit coverage
 
 **Repos:** dijji-mobile-demo
 
 - Mobile app / App — renders without throwing (__tests__/App.test.tsx)
+- ProductsScreen search — an empty query lists all 3 product cards and renders no empty-state text
+- ProductsScreen search — a case-insensitive substring query ('ESP') narrows the list to the single matching card
+- ProductsScreen search — a query matching nothing hides every card and shows 'No products match'
+- ProductsScreen search — deleting back to an empty query restores all 3 cards and removes the empty-state text
+- ProductsScreen search — title, welcome text and sign-out control stay intact while a query is active
 
-_Only test file in the repo._
+_6 Jest tests in __tests__/App.test.tsx: the original render smoke test plus a 'Products screen search' describe block of 5 cases, driven through react-test-renderer act() on the search_input onChangeText prop after a scripted sign-in; react-native-safe-area-context is jest-mocked. SignInScreen, DetailScreen and Root still have no dedicated unit tests._
 
 ### Unit coverage (proposed)
 
