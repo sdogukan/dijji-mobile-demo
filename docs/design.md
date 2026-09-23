@@ -80,7 +80,7 @@ _SignInScreen + AndroidManifest windowSoftInputMode._
 +------------------------------+
 ```
 
-_testIDs: products_title, signout_button, welcome_text, product_p1..p3._
+_Conflict: ProductsScreen renders a TextInput (testID search_input, accessibilityLabel/placeholder "Search products", styles.input) between welcome_text and the product list, plus an empty-state Text (testID empty_text). The committed wireframe shows neither. A wireframe is an intent artifact, so the existing diagram is kept unchanged until the user chooses._
 
 ### Products — notes
 
@@ -91,7 +91,7 @@ Body: FlatList of cards (border, radius 12, padding 16), name left, "<price> TL"
 Each card's accessibilityLabel is the product name.
 States: only a populated state — no empty/loading/error, since data is static.
 
-_ProductsScreen._
+_Conflict: the code now has two states (populated / empty) and a search box with autoCapitalize=none, autoCorrect=false, matching a case-insensitive substring of `name` only — `description` is not searched. The committed note explicitly states there is no empty state. Notes are an intent artifact, so the existing value is kept unchanged until the user chooses._
 
 ### Product detail — wireframe
 
