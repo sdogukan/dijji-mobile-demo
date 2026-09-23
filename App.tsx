@@ -157,16 +157,29 @@ function ProductsScreen({
       <Text style={styles.hint} testID="welcome_text">
         Welcome, {user}
       </Text>
-      <TextInput
-        testID="search_input"
-        accessibilityLabel="Search products"
-        placeholder="Search products"
-        autoCapitalize="none"
-        autoCorrect={false}
-        value={query}
-        onChangeText={setQuery}
-        style={styles.input}
-      />
+      <View style={styles.searchContainer}>
+        <TextInput
+          testID="search_input"
+          accessibilityLabel="Search products"
+          placeholder="Search products"
+          autoCapitalize="none"
+          autoCorrect={false}
+          value={query}
+          onChangeText={setQuery}
+          style={[styles.input, styles.searchInput]}
+        />
+        {query.length > 0 ? (
+          <Pressable
+            testID="search_clear_button"
+            accessibilityLabel="Clear search"
+            onPress={() => setQuery('')}
+            hitSlop={12}
+            style={styles.searchClearButton}
+          >
+            <Text style={styles.searchClearButtonText}>×</Text>
+          </Pressable>
+        ) : null}
+      </View>
       {filteredProducts.length === 0 ? (
         <Text style={styles.hint} testID="empty_text" accessibilityLabel="No products match">
           No products match
@@ -246,6 +259,14 @@ const styles = StyleSheet.create({
     color: '#111827',
   },
   error: { color: '#b91c1c', fontSize: 14 },
+  searchContainer: { justifyContent: 'center' },
+  searchInput: { paddingRight: 36 },
+  searchClearButton: {
+    position: 'absolute',
+    right: 10,
+    padding: 4,
+  },
+  searchClearButtonText: { fontSize: 18, fontWeight: '600', color: '#6b7280' },
   button: { backgroundColor: '#2563eb', borderRadius: 8, paddingVertical: 12, alignItems: 'center' },
   buttonText: { color: '#ffffff', fontSize: 16, fontWeight: '600' },
   link: { color: '#2563eb', fontSize: 16 },
