@@ -3,6 +3,7 @@
  */
 
 import React from 'react';
+import { FlatList, Keyboard } from 'react-native';
 import ReactTestRenderer, { act, type ReactTestInstance } from 'react-test-renderer';
 import App from '../App';
 
@@ -185,5 +186,48 @@ describe('Products screen CLI validation marker', () => {
     expect(root.findByProps({ testID: 'cli-validation-marker' }).props.children).toBe(
       'CLI iOS validation',
     );
+  });
+});
+
+describe('Products list keyboard taps', () => {
+  test('keeps handled taps while a query is typed, so a card press is not spent on dismissing the keyboard', async () => {
+    const root = await renderSignedIn();
+    await act(() => {
+      root.findByProps({ testID: 'search_input' }).props.onChangeText('esp');
+    });
+    const productList = root.findByType(FlatList);
+    expect(
+      findProductCards(productList).map(node => node.props.testID),
+    ).toEqual(['product_p1']);
+    expect(productList.props.keyboardShouldPersistTaps).toBe('handled');
+  });
+
+  test('pressing a card after a query dismisses the keyboard while search_input is still mounted, then opens its detail', async () => {
+    const root = await renderSignedIn();
+    await act(() => {
+      root.findByProps({ testID: 'search_input' }).props.onChangeText('esp');
+    });
+    const searchInputMountedAtDismiss: boolean[] = [];
+    const dismissSpy = jest
+      .spyOn(Keyboard, 'dismiss')
+      .mockImplementation(() => {
+        searchInputMountedAtDismiss.push(
+          root.findAllByProps({ testID: 'search_input' }).length > 0,
+        );
+      });
+    try {
+      await act(() => {
+        findProductCards(root)[0].props.onPress();
+      });
+      expect(searchInputMountedAtDismiss).toEqual([true]);
+      expect(root.findByProps({ testID: 'detail_title' }).props.children).toBe(
+        'Espresso',
+      );
+      expect(() =>
+        root.findByProps({ testID: 'cli-validation-marker' }),
+      ).toThrow();
+    } finally {
+      dismissSpy.mockRestore();
+    }
   });
 });
