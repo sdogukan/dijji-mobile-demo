@@ -152,3 +152,62 @@ describe('Products screen search clear button', () => {
     expect(() => root.findByProps({ testID: 'search_clear_button' })).toThrow();
   });
 });
+
+function orderedTestIDs(root: ReactTestInstance) {
+  const ids: string[] = [];
+  root.findAll((node) => typeof node.props.testID === 'string').forEach((node) => {
+    const testID = node.props.testID as string;
+    if (ids[ids.length - 1] !== testID) {
+      ids.push(testID);
+    }
+  });
+  return ids;
+}
+
+describe('CLI validation marker', () => {
+  test('renders exactly one marker with its text, testID and accessibilityLabel', async () => {
+    const root = await renderSignedIn();
+    const markers = root.findAllByProps({ testID: 'cli-validation-marker' }, { deep: false });
+    expect(markers).toHaveLength(1);
+    expect(markers[0].props.children).toBe('CLI validation');
+    expect(markers[0].props.accessibilityLabel).toBe('cli-validation-marker');
+  });
+
+  test('sits directly between welcome_text and search_input', async () => {
+    const root = await renderSignedIn();
+    const ids = orderedTestIDs(root);
+    const index = ids.indexOf('cli-validation-marker');
+    expect(index).toBeGreaterThan(0);
+    expect(ids[index - 1]).toBe('welcome_text');
+    expect(ids[index + 1]).toBe('search_input');
+  });
+
+  test.each(['', 'esp', 'xyz'])('stays rendered for the query %p', async (query) => {
+    const root = await renderSignedIn();
+    await act(() => {
+      root.findByProps({ testID: 'search_input' }).props.onChangeText(query);
+    });
+    const markers = root.findAllByProps({ testID: 'cli-validation-marker' }, { deep: false });
+    expect(markers).toHaveLength(1);
+    expect(markers[0].props.children).toBe('CLI validation');
+  });
+
+  test('is not rendered on the Sign in screen', async () => {
+    let renderer: ReactTestRenderer.ReactTestRenderer;
+    await act(() => {
+      renderer = ReactTestRenderer.create(<App />);
+    });
+    const root = renderer!.root;
+    expect(root.findByProps({ testID: 'signin_screen' })).toBeTruthy();
+    expect(root.findAllByProps({ testID: 'cli-validation-marker' })).toHaveLength(0);
+  });
+
+  test('is not rendered on the Product detail screen', async () => {
+    const root = await renderSignedIn();
+    await act(() => {
+      root.findByProps({ testID: 'product_p1' }).props.onPress();
+    });
+    expect(root.findByProps({ testID: 'detail_title' }).props.children).toBe('Espresso');
+    expect(root.findAllByProps({ testID: 'cli-validation-marker' })).toHaveLength(0);
+  });
+});

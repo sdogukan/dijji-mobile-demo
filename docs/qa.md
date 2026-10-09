@@ -41,8 +41,9 @@ _User-approved targets; no coverage threshold is configured in jest.config.js or
 | 7 | Search — narrow the list | Sign in -> type 'esp' into search_input -> product_p1 visible, product_p2 and product_p3 not visible -> open product_p1 -> detail_title 'Espresso' |
 | 8 | Search — no match and recovery | Sign in -> type 'xyz' into search_input -> no product_ card visible, empty_text 'No products match' -> clear search_input -> product_p1..p3 visible again |
 | 9 | Search — clear button | Sign in -> search_clear_button not visible -> type 'xyz' into search_input -> empty_text visible, search_clear_button visible -> tap search_clear_button -> search_input empty, product_p1..p3 visible, empty_text and search_clear_button not visible |
+| 10 | Products — CLI validation marker | App launch -> signin_screen visible, cli-validation-marker not visible -> sign in -> cli-validation-marker visible with text 'CLI validation' -> type 'xyz' into search_input -> cli-validation-marker still visible -> tap search_clear_button -> tap product_p1 -> detail_screen visible, cli-validation-marker not visible -> tap back_button -> cli-validation-marker visible |
 
-_Rows 1-8 unchanged. Row 9 added for the clear control shipped in ProductsScreen (testID `search_clear_button`, accessibilityLabel "Clear search", rendered only while the query is non-empty, onPress resets the query); expressed in the testIDs Maestro selects on. No Maestro flows are committed in the repo; DIJJI writes them per task into the run workspace/e2e/mobile/._
+_Rows 1-9 unchanged. Row 10 added for the static marker shipped in ProductsScreen (Text with testID and accessibilityLabel `cli-validation-marker`, text "CLI validation", rendered on Products only and independent of the search query); expressed in the testIDs Maestro selects on. No Maestro flows are committed in the repo; DIJJI writes them per task into the run workspace/e2e/mobile/._
 
 ### Unit coverage
 
@@ -59,8 +60,13 @@ _Rows 1-8 unchanged. Row 9 added for the clear control shipped in ProductsScreen
 - ProductsScreen search clear button — pressing it on a narrowing query ('esp') empties the input and restores all 3 cards with no empty-state text
 - ProductsScreen search clear button — pressing it on a no-match query ('xyz') empties the input and restores all 3 cards with no empty-state text
 - ProductsScreen search clear button — disappears when the query is deleted manually
+- ProductsScreen CLI validation marker — exactly one marker with text 'CLI validation' and its accessibility label
+- ProductsScreen CLI validation marker — sits directly between the welcome text and the search input
+- ProductsScreen CLI validation marker — stays rendered for the queries '', 'esp' and 'xyz'
+- ProductsScreen CLI validation marker — not rendered on the Sign in screen
+- ProductsScreen CLI validation marker — not rendered on the Product detail screen
 
-_11 Jest tests in __tests__/App.test.tsx: the original render smoke test, the 'Products screen search' describe block (5 cases) and the new 'Products screen search clear button' describe block (5 cases), all driven through react-test-renderer act() on the search_input onChangeText / search_clear_button onPress props after a scripted sign-in; react-native-safe-area-context is jest-mocked. SignInScreen, DetailScreen and Root still have no dedicated unit tests._
+_18 Jest tests in __tests__/App.test.tsx (npx jest: 18 passed): the original render smoke test, the 'Products screen search' describe block (5 cases), the 'Products screen search clear button' describe block (5 cases) and the new 'CLI validation marker' describe block (7 cases — 4 tests plus a test.each over 3 queries), all driven through react-test-renderer act() after a scripted sign-in; the marker's position check walks the rendered testIDs in order via an orderedTestIDs helper. react-native-safe-area-context is jest-mocked. SignInScreen, DetailScreen and Root still have no dedicated unit tests._
 
 ### Unit coverage (proposed)
 
