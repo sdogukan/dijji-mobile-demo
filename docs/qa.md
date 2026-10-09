@@ -8,11 +8,11 @@ _A field marked **Repos:** applies only to those repositories; a field without t
 
 **Repos:** dijji-mobile-demo
 
-- Unit / render — Jest (@react-native/jest-preset) + react-test-renderer, currently 1 test
+- Unit / render — Jest (@react-native/jest-preset) + react-test-renderer, currently 15 tests
 - E2E — Maestro flows run on emulator/simulator by the dijji CLI at the DIJJI mobile gate
 - Integration dropped — no backend or modules to integrate; E2E covers every screen path
 
-___tests__/App.test.tsx and jest.config.js; README 'How DIJJI uses this repository'._
+___tests__/App.test.tsx and jest.config.js; README 'How DIJJI uses this repository'. Only the unit-test count was refreshed from the code (npx jest — 15 passed); the chosen levels are unchanged._
 
 ### Coverage targets
 
@@ -42,8 +42,9 @@ _User-approved targets; no coverage threshold is configured in jest.config.js or
 | 8 | Search — no match and recovery | Sign in -> type 'xyz' into search_input -> no product_ card visible, empty_text 'No products match' -> clear search_input -> product_p1..p3 visible again |
 | 9 | Search — clear button | Sign in -> search_clear_button not visible -> type 'xyz' into search_input -> empty_text visible, search_clear_button visible -> tap search_clear_button -> search_input empty, product_p1..p3 visible, empty_text and search_clear_button not visible |
 | 10 | Products — CLI iOS validation marker | App launch -> signin_screen visible, cli-validation-marker not visible -> sign in -> cli-validation-marker visible with text 'CLI iOS validation' -> type 'xyz' into search_input -> cli-validation-marker still visible -> tap search_clear_button -> tap product_p1 -> detail_screen visible, cli-validation-marker not visible -> tap back_button -> cli-validation-marker visible |
+| 11 | Search — open a product with the keyboard open | Sign in -> tap search_input and type 'esp' (keyboard stays open) -> tap product_p1 once -> detail_screen visible with detail_title 'Espresso', keyboard hidden -> tap back_button -> products_screen visible |
 
-_Rows 1-9 unchanged. Row 10 reflects the static marker shipped in ProductsScreen (Text with testID `cli-validation-marker`, text and accessibilityLabel "CLI iOS validation", rendered on Products only and independent of the search query); expressed in the testIDs Maestro selects on. No Maestro flows are committed in the repo; DIJJI writes them per task into the run workspace/e2e/mobile/._
+_Rows 1-10 unchanged. Row 11 reflects this task's change in ProductsScreen — the product FlatList has keyboardShouldPersistTaps="handled" and each card's onPress calls Keyboard.dismiss() before opening the detail — so the first tap on a card opens it even while the search keyboard is up; expressed in the testIDs Maestro selects on. No Maestro flows are committed in the repo; DIJJI writes them per task into the run workspace/e2e/mobile/._
 
 ### Unit coverage
 
@@ -62,8 +63,10 @@ _Rows 1-9 unchanged. Row 10 reflects the static marker shipped in ProductsScreen
 - ProductsScreen search clear button — disappears when the query is deleted manually
 - ProductsScreen CLI validation marker — exactly one marker with text 'CLI iOS validation', the same accessibility label, no press handler and the welcome text's hint style, placed directly between the welcome text and the search input
 - ProductsScreen CLI validation marker — stays rendered with its text while a no-match query ('xyz') shows the empty-state text
+- ProductsScreen keyboard taps — with a query typed, the product list keeps handled taps so a card press is not spent on dismissing the keyboard
+- ProductsScreen keyboard taps — pressing a card after a query dismisses the keyboard while the search input is still mounted, then opens that product's detail, where the CLI validation marker is not rendered
 
-_13 Jest tests in __tests__/App.test.tsx (npx jest: 13 passed): the original render smoke test, the 'Products screen search' describe block (5 cases), the 'Products screen search clear button' describe block (5 cases) and the 'Products screen CLI validation marker' describe block (2 cases), all driven through react-test-renderer act() after a scripted sign-in; the marker's position check walks the rendered tree with findAll and records the first occurrence of each testID in order. The marker's absence on Sign in and Product detail is not unit-tested (covered by E2E row 10). react-native-safe-area-context is jest-mocked. SignInScreen, DetailScreen and Root still have no dedicated unit tests._
+_15 Jest tests in __tests__/App.test.tsx (npx jest: 15 passed): the original render smoke test, the 'Products screen search' describe block (5 cases), the 'Products screen search clear button' describe block (5 cases), the 'Products screen CLI validation marker' describe block (2 cases) and the 'Products list keyboard taps' describe block (2 cases), all driven through react-test-renderer act() after a scripted sign-in. The keyboard cases assert keyboardShouldPersistTaps='handled' on the FlatList and spy on Keyboard.dismiss (jest.spyOn) to check it runs while search_input is still mounted, before detail_title shows. The marker's position check walks the rendered tree with findAll. The marker's absence on Product detail is now unit-tested; its absence on Sign in is not (covered by E2E row 10). react-native-safe-area-context is jest-mocked. SignInScreen, DetailScreen and Root still have no dedicated unit tests._
 
 ### Unit coverage (proposed)
 

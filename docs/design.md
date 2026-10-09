@@ -91,7 +91,7 @@ Body: FlatList of cards (border, radius 12, padding 16), name left, "<price> TL"
 Each card's accessibilityLabel is the product name.
 States: only a populated state — no empty/loading/error, since data is static.
 
-_Conflict: the code has two list states (populated / empty) and a search box with autoCapitalize=none, autoCorrect=false, matching a case-insensitive substring of `name` only — `description` is not searched. This change adds a clear control: rendered only while the query is non-empty, accessibilityLabel "Clear search", hitSlop 12, onPress resets the query to '' (list restored, empty-state text removed); deleting the text manually also hides it. The committed note explicitly states there is no empty state. Notes are an intent artifact, so the existing value is kept unchanged until the user chooses._
+_Conflict: the code has two list states (populated / empty) and a search box with autoCapitalize=none, autoCorrect=false, matching a case-insensitive substring of `name` only — `description` is not searched. A clear control (testID `search_clear_button`, accessibilityLabel "Clear search", hitSlop 12) is rendered only while the query is non-empty and resets it to '' (list restored, empty-state text removed). This task sets `keyboardShouldPersistTaps="handled"` on the product FlatList and calls `Keyboard.dismiss()` before `onOpen(item)` in each card's onPress, so a card tap with the search keyboard open opens the detail on the first tap and closes the keyboard. The committed note explicitly states there is no empty state. Notes are an intent artifact, so the existing value is kept unchanged until the user chooses._
 
 ### Product detail — wireframe
 

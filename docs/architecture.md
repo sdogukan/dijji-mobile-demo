@@ -71,9 +71,9 @@ _Root onSignOut: setUser(null), setScreen({name: 'signin'}); SignInScreen remoun
 
 - Mobile app (JS bundle, App.tsx) — all screens, navigation state, product catalog and demo sign-in
 - Android host (MainActivity, MainApplication) — boots React Native with New Architecture + Hermes
-- iOS host (AppDelegate) — boots React Native via RCTReactNativeFactory; loads main.jsbundle in release
+- iOS host (AppDelegate + SceneDelegate) — UIScene lifecycle with a single scene; AppDelegate builds the RCTReactNativeFactory, SceneDelegate creates the window and starts React Native; loads main.jsbundle in release
 
-_Native hosts are unmodified React Native template entry points registering module name DijjiMobileDemo._
+_The Android host is the unmodified React Native template entry point. The iOS host no longer owns a window in AppDelegate: Info.plist declares UIApplicationSceneManifest (UIApplicationSupportsMultipleScenes false, one "Default Configuration" with delegate $(PRODUCT_MODULE_NAME).SceneDelegate); AppDelegate keeps the factory and launch options and returns that configuration, and SceneDelegate.scene(_:willConnectTo:options:) creates a UIWindow for the window scene and calls factory.startReactNative. Both hosts register module name DijjiMobileDemo._
 
 ### Database tables
 
@@ -90,7 +90,7 @@ _No persistence layer exists._
 ```
 +---------------------------+      +---------------------------+
 | Android host (Kotlin)     |      | iOS host (Swift)          |
-| MainActivity/MainApp      |      | AppDelegate               |
+| MainActivity/MainApp      |      | AppDelegate/SceneDelegate |
 +-------------+-------------+      +-------------+-------------+
               |                                  |
               +---------------+------------------+
@@ -110,7 +110,7 @@ _No persistence layer exists._
 (no outbound network connections)
 ```
 
-_Maestro drives the app only during DIJJI's mobile gate (README)._
+_Maestro drives the app only during DIJJI's mobile gate (README). On iOS, SceneDelegate starts React Native in the scene's window (UIScene lifecycle)._
 
 ## Database Design
 
