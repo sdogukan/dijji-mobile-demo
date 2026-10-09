@@ -80,7 +80,7 @@ _SignInScreen + AndroidManifest windowSoftInputMode._
 +------------------------------+
 ```
 
-_Conflict: ProductsScreen renders a `searchContainer` View between `welcome_text` and the product list, holding a TextInput (testID `search_input`, placeholder "Search products", right padding 36) and, only while the query is non-empty, a "×" Pressable (testID `search_clear_button`) absolutely positioned 10pt from the input's right edge; an empty-state Text (testID `empty_text`) replaces the list when nothing matches. The committed wireframe shows none of these. A wireframe is an intent artifact, so the existing diagram is kept unchanged until the user chooses._
+_Conflict: ProductsScreen now renders, between `welcome_text` and the product list, (1) a static, non-pressable Text "CLI iOS validation" (testID `cli-validation-marker`, accessibilityLabel "CLI iOS validation", `hint` style 14 / #6b7280), always shown on Products regardless of the query; it is defined only in ProductsScreen, so Sign in and Product detail do not render it; (2) a `searchContainer` View holding a TextInput (testID `search_input`, placeholder "Search products", right padding 36) and, only while the query is non-empty, a "×" Pressable (testID `search_clear_button`) absolutely positioned 10pt from the input's right edge. An empty-state Text (testID `empty_text`) replaces the list when nothing matches. The committed wireframe shows none of these. A wireframe is an intent artifact, so the existing diagram is kept unchanged until the user chooses._
 
 ### Products — notes
 

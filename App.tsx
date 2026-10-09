@@ -157,6 +157,9 @@ function ProductsScreen({
       <Text style={styles.hint} testID="welcome_text">
         Welcome, {user}
       </Text>
+      <Text style={styles.hint} testID="cli-validation-marker" accessibilityLabel="CLI iOS validation">
+        CLI iOS validation
+      </Text>
       <View style={styles.searchContainer}>
         <TextInput
           testID="search_input"

@@ -152,3 +152,38 @@ describe('Products screen search clear button', () => {
     expect(() => root.findByProps({ testID: 'search_clear_button' })).toThrow();
   });
 });
+
+describe('Products screen CLI validation marker', () => {
+  test('renders once between welcome_text and search_input with its text, label and hint style', async () => {
+    const root = await renderSignedIn();
+    const marker = root.findByProps({ testID: 'cli-validation-marker' });
+    expect(marker.props.children).toBe('CLI iOS validation');
+    expect(marker.props.accessibilityLabel).toBe('CLI iOS validation');
+    expect(marker.props.onPress).toBeUndefined();
+    expect(marker.props.style).toBe(root.findByProps({ testID: 'welcome_text' }).props.style);
+
+    const order: string[] = [];
+    root.findAll(node => {
+      const testID = node.props.testID;
+      if (
+        ['welcome_text', 'cli-validation-marker', 'search_input'].includes(testID) &&
+        !order.includes(testID)
+      ) {
+        order.push(testID);
+      }
+      return false;
+    });
+    expect(order).toEqual(['welcome_text', 'cli-validation-marker', 'search_input']);
+  });
+
+  test('stays rendered while a no-match query shows empty_text', async () => {
+    const root = await renderSignedIn();
+    await act(() => {
+      root.findByProps({ testID: 'search_input' }).props.onChangeText('xyz');
+    });
+    expect(root.findByProps({ testID: 'empty_text' })).toBeTruthy();
+    expect(root.findByProps({ testID: 'cli-validation-marker' }).props.children).toBe(
+      'CLI iOS validation',
+    );
+  });
+});
