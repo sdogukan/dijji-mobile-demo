@@ -13,6 +13,7 @@
 import { useState } from 'react';
 import {
   FlatList,
+  Keyboard,
   Pressable,
   StatusBar,
   StyleSheet,
@@ -196,7 +197,10 @@ function ProductsScreen({
             <Pressable
               testID={`product_${item.id}`}
               accessibilityLabel={item.name}
-              onPress={() => onOpen(item)}
+              onPress={() => {
+                Keyboard.dismiss();
+                onOpen(item);
+              }}
               style={styles.card}
             >
               <Text style={styles.cardTitle}>{item.name}</Text>
