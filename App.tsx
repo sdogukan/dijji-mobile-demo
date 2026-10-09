@@ -191,6 +191,7 @@ function ProductsScreen({
         <FlatList
           data={filteredProducts}
           keyExtractor={(item) => item.id}
+          keyboardShouldPersistTaps="handled"
           renderItem={({ item }) => (
             <Pressable
               testID={`product_${item.id}`}
